@@ -1,0 +1,6 @@
+Image maze200px.png loaded, H:401 W:401
+Solution saved @ maze200px_solved.png
+
+real    0m1.057s
+user    0m1.048s
+sys     0m0.233s
