@@ -12,7 +12,6 @@ class potatoMaze:
 
     def isWall(self, refpx):
 
-        # use x,y .. everything else here uses y,x because PIL
         for x in range(0, 3):
             if refpx[x] != self.wallc[x]:
                 return False
@@ -26,61 +25,61 @@ class potatoMaze:
         self.scd = 3
 
         # make array of 0s, then fill in walls w/ 1s
-        self.mazeData = np.zeros((self.height, self.width))
+        self.mazeData = np.zeros((self.width, self.height))
 
         for y in range(0, self.height):
             for x in range(0, self.width):
 
                 if self.isWall(self.px[x, y]):
-                    self.mazeData[y, x] = self.wcd
+                    self.mazeData[x, y] = self.wcd
 
         # search for entry points to maze
-        entriesLimit = 2
         self.entries = []
+
         for x in range(0, self.width):
 
-            if self.isWall(self.px[0, x]) == False:
+            if self.isWall(self.px[x, 0]) == False:
                 self.entries.append([x, 0])
 
-            if self.isWall(self.px[self.height-1, x]) == False:
+            if self.isWall(self.px[x, self.height-1]) == False:
                 self.entries.append([x, self.height-1])
 
         for y in range(0, self.height):
 
-            if self.isWall(self.px[y, 0]) == False:
+            if self.isWall(self.px[0, y]) == False:
                 self.entries.append([0, y])
 
-            if self.isWall(self.px[y, self.width-1]) == False:
+            if self.isWall(self.px[self.width-1, y]) == False:
                 self.entries.append([self.width-1, y])
 
-        #print("Entries: %s\n" % self.entries)
+        print("Entries: %s\n" % self.entries)
         #print(self.mazeData)
 
     def possibleMoves(self, cpos):
 
         newMoves = []
-        x = cpos[1]
-        y = cpos[0]
+        x = cpos[0]
+        y = cpos[1]
 
         # up
         if y > 0:
             if self.isWall(self.px[x, y-1]) == False:
-                newMoves.append([y-1, x])
+                newMoves.append([x, y-1])
 
         # down
         if y < self.height-1:
             if self.isWall(self.px[x, y+1]) == False:
-                newMoves.append([y+1, x])
+                newMoves.append([x, y+1])
 
         # left
         if x > 0:
             if self.isWall(self.px[x-1, y]) == False:
-                newMoves.append([y, x-1])
+                newMoves.append([x-1, y])
 
         # right
         if x < self.width-1:
             if self.isWall(self.px[x+1, y]) == False:
-                newMoves.append([y, x+1])
+                newMoves.append([x+1, y])
 
         return newMoves
 
@@ -94,7 +93,7 @@ class potatoMaze:
         branchOrEnd = False
         while branchOrEnd == False:
 
-            #print("\nNew loop\n%s" % (currentPath))
+            #print("\nNew loop\n")
             head = len(currentPath)-1
             possMoves = self.possibleMoves(currentPath[head])
 
@@ -103,6 +102,13 @@ class potatoMaze:
             if currentPath[head-1] in possMoves:
                 possMoves.remove(currentPath[head-1])
 
+            # check if exit is in possMoves
+            if self.entries[1] in possMoves:
+                print("Found exit")
+                currentPath.append(possMoves[0])
+                self.solution = currentPath
+                branchOrEnd = True
+                return True
 
             #print("cph: %s .. pm: %s" % (currentPath[head], possMoves))
             nPossMoves = len(possMoves)
@@ -124,15 +130,7 @@ class potatoMaze:
 
             # only 0 option
             elif nPossMoves == 1:
-                # check if we're at the end
-                if self.entries[1][0] == possMoves[0][0] and \
-                        self.entries[1][1] == possMoves[0][1]:
-                            currentPath.append(possMoves[0])
-                            self.solution = currentPath
-                            return True
-                # otherwise continue
-                else:
-                    currentPath.append(possMoves[0])
+                currentPath.append(possMoves[0])
 
     def updateMazeWithSolution(self):
 
@@ -149,7 +147,7 @@ class potatoMaze:
         for y in range(0, self.height):
             for x in range(0, self.width):
 
-                z = self.mazeData[y, x]
+                z = self.mazeData[x, y]
                 if z == self.wcd:
                     tmp = self.wallc
                 elif z == self.mcd:
@@ -173,6 +171,8 @@ class potatoMaze:
 
         # load image
         self.im = Image.open(imageLocation)
+        if self.im.mode != 'RGBA':
+            self.im = self.im.convert('RGBA')
 
         # load pixels
         self.px = self.im.load()
@@ -180,7 +180,7 @@ class potatoMaze:
         # what do we know about image
         self.height = self.im.height
         self.width = self.im.width
-        print("Image %s loaded, H:%s W:%s" % (imageLocation, self.height, self.width))
+        #print("Image %s loaded, H:%s W:%s" % (imageLocation, self.height, self.width))
 
         # generate maze data as an array
         self.makeMaze()
@@ -196,9 +196,10 @@ class potatoMaze:
         # make solution into an image
         self.newName = imageLocation.split('.')[0] + "_solved." + imageLocation.split('.')[1]
         self.createSolutionImage(self.newName)
-
+        
 
 
 if __name__ == "__main__":
 
-    maze = potatoMaze("maze200px.png")
+    maze = potatoMaze("huger.png")
+    #maze = potatoMaze("maze200px.png")
