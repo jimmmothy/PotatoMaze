@@ -3,6 +3,12 @@
 # Solve maze generated @ https://keesiemeijer.github.io/maze-generator/
 #
 # Dependencies- PIL, numpy
+#
+# to do-
+# split up class a bit
+# differant path finding algorithms
+# arguments
+
 
 import PIL
 from PIL import Image
@@ -196,7 +202,7 @@ class potatoMaze:
         # make solution into an image
         self.newName = imageLocation.split('.')[0] + "_solved." + imageLocation.split('.')[1]
         self.createSolutionImage(self.newName)
-        
+
 
 
 if __name__ == "__main__":
