@@ -36,31 +36,35 @@ class pathFinder:
 
 
 
-    def doTheNeedfull(self, algo):
+    #################
+    # Need to call the shortestPath recursively
+    # this sets it up
+    #################
+    def doTheNeedfull(self):
 
-            
-        if algo == "shortestPath":
-            self.solution = []
-            self.solution.append(self.entries[0])
-            self.shortestPath(self.solution)
-            return self.solution
+        self.solution = []
+        self.solution.append(self.entries[0])
+        self.shortestPath(self.solution)
+        return self.solution
 
-        else:
-            print("No algo?")
-            return []
-
+    ##############
+    # Is x,t a wall?
+    ##############
     def isWall(self, x, y):
 
         if self.mazeData[x, y] != self.wcd:
                 return False
         return True
 
+    ######################
+    # Actual path finding
+    ######################
     def shortestPath(self, currentPath):
 
         # try to find path between self.entries[0] and self.entries[1]
         # call possibleMoves for head of currentPath
-        # if no moves, end iteration, if 1 move, append and continue,
-        # if more than 1 move, then branch each possible path
+        # if no moves, end iteration/branch, if 1 move, look for exit/append and continue,
+        # if more than 1 move, look for exit/then branch each possible path
 
         branchOrEnd = False
         while branchOrEnd == False:
@@ -132,10 +136,14 @@ class pathFinder:
 
         return newMoves
 
-
+##################################################
 # Manages image import/export and data management
+##################################################
 class potatoMaze:
 
+    ###################
+    # Is this a wall?
+    ###################
     def isWall(self, refpx):
 
         for x in range(0, 3):
@@ -143,7 +151,9 @@ class potatoMaze:
                 return False
         return True
 
-
+    ######################
+    # Convert the RGBA file to a numpy array
+    ######################
     def makeMaze(self):
 
         # reference for wall/maze in numpy array
@@ -182,12 +192,17 @@ class potatoMaze:
         print("Entries: %s" % self.entries)
 
 
+    ######################
+    # Update maze with solution path
+    ######################
     def updateMazeWithSolution(self):
 
         for x in self.solution:
             self.mazeData[x[0], x[1]] = self.scd
 
-
+    ########################
+    # Create a new image with the solution included
+    ########################
     def createSolutionImage(self, newName):
 
         # make a new PIl image based on solution
@@ -237,6 +252,9 @@ class potatoMaze:
         self.makeMaze()
         self.solution = []
 
+    ####################
+    # Call a few functions to sort things out
+    ####################
     def finalise(self):
 
         # update mazeData with solution path
@@ -252,5 +270,5 @@ if __name__ == "__main__":
 
     maze = potatoMaze("maze200px.png")
     algo = pathFinder(maze.mazeData, maze.height, maze.width, maze.entries)
-    maze.solution = algo.doTheNeedfull("shortestPath")
+    maze.solution = algo.doTheNeedfull()
     maze.finalise()
