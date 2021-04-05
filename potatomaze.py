@@ -5,7 +5,6 @@
 # Dependencies- PIL, numpy
 #
 # to do-
-# differant path finding algorithms
 # arguments
 
 
